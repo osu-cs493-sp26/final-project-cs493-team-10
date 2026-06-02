@@ -1,0 +1,72 @@
+datasource db {
+    provider = "postgresql"
+}
+
+generator client {
+    provider = "prisma-client"
+    output   = "../generated/prisma"
+}
+
+enum Role {
+    admin
+    instructor
+    student
+}
+
+model User {
+    id            Int    @id @default(autoincrement())
+    name          String
+    email         String @unique
+    password_hash String
+    role          Role
+
+    enrollments CourseStudent[]
+    submissions Submission[]
+}
+
+model Course {
+    id            Int    @id @default(autoincrement())
+    subject_code  String
+    number        Int
+    title         String
+    term          String
+    instructor_id Int
+
+    assignments Assignment[]
+    enrollments CourseStudent[]
+}
+
+model Assignment {
+    id        Int      @id @default(autoincrement())
+    title     String
+    points    Int
+    due_date  DateTime
+    course_id Int
+
+    course      Course       @relation(fields: [course_id], references: [id])
+    submissions Submission[]
+}
+
+model Submission {
+    id               Int      @id @default(autoincrement())
+    submitted_at     DateTime
+    file_url         String
+    plagiarism_score Int?
+    grade            Int?
+    assignment_id    Int
+    student_id       Int
+
+    assignment Assignment @relation(fields: [assignment_id], references: [id])
+    student    User       @relation(fields: [student_id], references: [id])
+}
+
+model CourseStudent {
+    id         Int @id @default(autoincrement())
+    student_id Int
+    course_id  Int
+
+    student User   @relation(fields: [student_id], references: [id])
+    course  Course @relation(fields: [course_id], references: [id])
+
+    @@unique([student_id, course_id])
+}
