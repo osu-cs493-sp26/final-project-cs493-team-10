@@ -1,0 +1,6 @@
+.git
+.env.local
+node_modules
+generated
+assignment-notes.md
+.DS_Store
