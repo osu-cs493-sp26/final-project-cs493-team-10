@@ -1,6 +1,6 @@
 # Tarpaulin
 
-A lightweight course management API, developed as an OSU upper level class project.
+A lightweight course management API, developed as an Oregon State University upper level class project.
 
 ## Introduction
 
