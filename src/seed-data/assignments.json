@@ -1,0 +1,62 @@
+[
+    {
+        "title": "Hello World",
+        "points": 10,
+        "due_date": "2024-10-01T23:59:00Z",
+        "course_id": 1
+    },
+    {
+        "title": "Variables and Loops",
+        "points": 20,
+        "due_date": "2024-10-15T23:59:00Z",
+        "course_id": 1
+    },
+    {
+        "title": "Linked List Implementation",
+        "points": 50,
+        "due_date": "2024-10-10T23:59:00Z",
+        "course_id": 2
+    },
+    {
+        "title": "Binary Search Tree",
+        "points": 50,
+        "due_date": "2024-10-25T23:59:00Z",
+        "course_id": 2
+    },
+    {
+        "title": "Sorting Algorithms",
+        "points": 40,
+        "due_date": "2024-11-01T23:59:00Z",
+        "course_id": 3
+    },
+    {
+        "title": "Graph Traversal",
+        "points": 60,
+        "due_date": "2024-11-15T23:59:00Z",
+        "course_id": 3
+    },
+    {
+        "title": "Process Scheduling",
+        "points": 75,
+        "due_date": "2024-11-05T23:59:00Z",
+        "course_id": 4
+    },
+    {
+        "title": "Memory Management",
+        "points": 75,
+        "due_date": "2024-11-20T23:59:00Z",
+        "course_id": 4
+    },
+    {
+        "title": "REST API Project",
+        "points": 100,
+        "due_date": "2025-03-15T23:59:00Z",
+        "course_id": 7
+    },
+    {
+        "title": "Docker Assignment",
+        "points": 50,
+        "due_date": "2025-02-15T23:59:00Z",
+        "course_id": 7
+    }
+]

@@ -1,0 +1,82 @@
+[
+    {
+        "submitted_at": "2024-09-30T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/1",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 1,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2024-09-30T21:00:00Z",
+        "file_url": "http://localhost:3000/submissions/2",
+        "plagiarism_score": 12,
+        "grade": null,
+        "assignment_id": 1,
+        "student_id": 5
+    },
+    {
+        "submitted_at": "2024-10-14T18:00:00Z",
+        "file_url": "http://localhost:3000/submissions/3",
+        "plagiarism_score": 5,
+        "grade": 95,
+        "assignment_id": 2,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2024-10-14T22:00:00Z",
+        "file_url": "http://localhost:3000/submissions/4",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 2,
+        "student_id": 6
+    },
+    {
+        "submitted_at": "2024-10-09T19:00:00Z",
+        "file_url": "http://localhost:3000/submissions/5",
+        "plagiarism_score": 30,
+        "grade": 80,
+        "assignment_id": 3,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2024-10-09T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/6",
+        "plagiarism_score": 8,
+        "grade": 92,
+        "assignment_id": 3,
+        "student_id": 7
+    },
+    {
+        "submitted_at": "2024-10-24T23:00:00Z",
+        "file_url": "http://localhost:3000/submissions/7",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 4,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2025-02-14T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/8",
+        "plagiarism_score": 15,
+        "grade": null,
+        "assignment_id": 10,
+        "student_id": 5
+    },
+    {
+        "submitted_at": "2025-02-14T21:00:00Z",
+        "file_url": "http://localhost:3000/submissions/9",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 10,
+        "student_id": 6
+    },
+    {
+        "submitted_at": "2025-03-14T23:00:00Z",
+        "file_url": "http://localhost:3000/submissions/10",
+        "plagiarism_score": 22,
+        "grade": 88,
+        "assignment_id": 9,
+        "student_id": 5
+    }
+]
