@@ -58,5 +58,65 @@
         "email": "jake@tarpaulin.edu",
         "password_hash": "password",
         "role": "student"
+    },
+    {
+        "name": "Karen Student",
+        "email": "karen@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Leo Student",
+        "email": "leo@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Mia Student",
+        "email": "mia@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Nate Student",
+        "email": "nate@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Olivia Student",
+        "email": "olivia@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Pete Student",
+        "email": "pete@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Quinn Student",
+        "email": "quinn@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Rachel Student",
+        "email": "rachel@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
+    },
+    {
+        "name": "Sam Instructor",
+        "email": "sam@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "instructor"
+    },
+    {
+        "name": "Tina Student",
+        "email": "tina@tarpaulin.edu",
+        "password_hash": "password",
+        "role": "student"
     }
 ]

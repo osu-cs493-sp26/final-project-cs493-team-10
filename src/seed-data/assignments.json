@@ -58,5 +58,65 @@
         "points": 50,
         "due_date": "2025-02-15T23:59:00Z",
         "course_id": 7
+    },
+    {
+        "title": "Functions and Recursion",
+        "points": 25,
+        "due_date": "2024-11-01T23:59:00Z",
+        "course_id": 1
+    },
+    {
+        "title": "Object Oriented Design",
+        "points": 35,
+        "due_date": "2024-11-15T23:59:00Z",
+        "course_id": 1
+    },
+    {
+        "title": "Hash Table Implementation",
+        "points": 60,
+        "due_date": "2024-11-10T23:59:00Z",
+        "course_id": 2
+    },
+    {
+        "title": "Dynamic Programming",
+        "points": 70,
+        "due_date": "2024-11-25T23:59:00Z",
+        "course_id": 2
+    },
+    {
+        "title": "Divide and Conquer",
+        "points": 50,
+        "due_date": "2024-11-20T23:59:00Z",
+        "course_id": 3
+    },
+    {
+        "title": "NP-Completeness Problems",
+        "points": 80,
+        "due_date": "2024-12-05T23:59:00Z",
+        "course_id": 3
+    },
+    {
+        "title": "File System Implementation",
+        "points": 90,
+        "due_date": "2024-12-01T23:59:00Z",
+        "course_id": 4
+    },
+    {
+        "title": "Thread Synchronization",
+        "points": 85,
+        "due_date": "2024-12-15T23:59:00Z",
+        "course_id": 4
+    },
+    {
+        "title": "Database Schema Design",
+        "points": 60,
+        "due_date": "2025-01-20T23:59:00Z",
+        "course_id": 7
+    },
+    {
+        "title": "Authentication Middleware",
+        "points": 75,
+        "due_date": "2025-02-01T23:59:00Z",
+        "course_id": 7
     }
 ]
