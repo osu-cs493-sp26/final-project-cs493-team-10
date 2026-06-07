@@ -2,61 +2,61 @@
     {
         "name": "Alice Admin",
         "email": "alice@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "admin"
     },
     {
         "name": "Bob Instructor",
         "email": "bob@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "instructor"
     },
     {
         "name": "Carol Instructor",
         "email": "carol@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "instructor"
     },
     {
         "name": "Dave Student",
         "email": "dave@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     },
     {
         "name": "Eve Student",
         "email": "eve@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     },
     {
         "name": "Frank Student",
         "email": "frank@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     },
     {
         "name": "Grace Student",
         "email": "grace@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     },
     {
         "name": "Hank Student",
         "email": "hank@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     },
     {
         "name": "Ivy Student",
         "email": "ivy@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     },
     {
         "name": "Jake Student",
         "email": "jake@tarpaulin.edu",
-        "password_hash": "$2b$10$placeholder",
+        "password_hash": "password",
         "role": "student"
     }
 ]
