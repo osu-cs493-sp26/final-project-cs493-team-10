@@ -52,7 +52,7 @@ model Submission {
     submitted_at     DateTime @default(now())
     file_url         String // where in system the file is stored at (not og file name)
     plagiarism_score Int?
-    grade            Int?
+    grade            Float?
     assignment_id    Int
     student_id       Int
 
