@@ -13,7 +13,7 @@
         "plagiarism_score": 12,
         "grade": null,
         "assignment_id": 1,
-        "student_id": 5
+        "student_id": 2
     },
     {
         "submitted_at": "2024-10-14T18:00:00Z",
@@ -140,23 +140,23 @@
         "file_url": "http://localhost:3000/submissions/18",
         "plagiarism_score": 25,
         "grade": 70,
-        "assignment_id": 8,
-        "student_id": 9
+        "assignment_id": 1,
+        "student_id": 2
     },
     {
         "submitted_at": "2025-03-14T21:00:00Z",
         "file_url": "http://localhost:3000/submissions/19",
         "plagiarism_score": null,
         "grade": null,
-        "assignment_id": 9,
-        "student_id": 6
+        "assignment_id": 1,
+        "student_id": 2
     },
     {
         "submitted_at": "2025-02-14T19:00:00Z",
         "file_url": "http://localhost:3000/submissions/20",
         "plagiarism_score": 9,
         "grade": 94,
-        "assignment_id": 10,
-        "student_id": 7
+        "assignment_id": 1,
+        "student_id": 2
     }
 ]
