@@ -49,8 +49,8 @@ model Assignment {
 
 model Submission {
     id               Int      @id @default(autoincrement())
-    submitted_at     DateTime
-    file_url         String
+    submitted_at     DateTime @default(now())
+    file_url         String // where in system the file is stored at (not og file name)
     plagiarism_score Int?
     grade            Int?
     assignment_id    Int
