@@ -106,6 +106,7 @@ router.post('/:id/submissions',
 
         // create data obj to store in db.
         const data = {
+            file_name: filename,
             assignment_id: assignmentId,
             // TODO: add student_id from auth info (for now, this is hardcoded to 2)
             student_id: 2
