@@ -50,7 +50,8 @@ model Assignment {
 model Submission {
     id               Int      @id @default(autoincrement())
     submitted_at     DateTime @default(now())
-    file_url         String // URL link to Supabase where the file is stored at (not the og name)
+    file_name        String // the name of the file in supabase (not the original name)
+    file_url         String // URL link to Supabase where the file is stored at
     plagiarism_score Int?
     grade            Int?
     assignment_id    Int
