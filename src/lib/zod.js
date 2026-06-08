@@ -13,5 +13,5 @@ export const Assignment = z.object({})
 
 // used to validate the grade assignment in the update submission endpoint
 export const UpdateSubmissionSchema = z.object({
-    grade: z.int().min(0).max(100).optional(),
+    grade: z.int().min(0).max(100),
 })
