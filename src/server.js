@@ -37,6 +37,8 @@ app.use((err, req, res, next) => {
          * In our app, we'll always want to send a 404 in this case.
          */
         next()
+    } else if (err.type === 'entity.parse.failed') {
+        return res.status(400).send({ error: "Invalid JSON in request body" })
     } else {
         console.error(err)
         res.status(500).send(err)
