@@ -1,11 +1,88 @@
 import { Router } from 'express'
 
 import prisma from '../../lib/prisma.js'
+import { PAGE_SIZE } from '../../constants.js'
 import { Course } from '../../lib/zod.js'
 // TODO: swap for `../../lib/auth.js` once Calvin pushes the real JWT middleware.
 import { requireAuthentication } from '../../lib/dev-auth.js'
 
 const router = Router()
+
+/*
+ * GET /courses
+ * Public.  Returns a paginated list of all Courses, optionally filtered by
+ * subject (subject_code), number, and/or term.  The list excludes each
+ * Course's enrolled students and Assignments.
+ */
+router.get('/', async (req, res, next) => {
+    let page = parseInt(req.query.page)
+    if (Number.isNaN(page) || page < 1) {
+        page = 1
+    }
+    const pageSize = PAGE_SIZE
+
+    // Build the filter from the supported query params.
+    const where = {}
+    if (req.query.subject) {
+        where.subject_code = req.query.subject
+    }
+    if (req.query.term) {
+        where.term = req.query.term
+    }
+    // `number` is an int column; a non-numeric filter value matches nothing.
+    if (req.query.number !== undefined) {
+        const number = parseInt(req.query.number)
+        if (Number.isNaN(number)) {
+            return res.status(200).send({
+                courses: [],
+                page: page,
+                pageSize: pageSize,
+                totalCount: 0,
+                totalPages: 0,
+                links: {}
+            })
+        }
+        where.number = number
+    }
+
+    const [courses, totalCount] = await prisma.$transaction([
+        prisma.course.findMany({
+            where: where,
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            orderBy: { id: 'asc' }
+        }),
+        prisma.course.count({ where: where })
+    ])
+    const totalPages = Math.ceil(totalCount / pageSize)
+
+    // Build next/prev links, preserving any active filters.
+    const baseParams = new URLSearchParams()
+    if (req.query.subject) baseParams.set('subject', req.query.subject)
+    if (req.query.number !== undefined) baseParams.set('number', req.query.number)
+    if (req.query.term) baseParams.set('term', req.query.term)
+    const linkFor = (targetPage) => {
+        const params = new URLSearchParams(baseParams)
+        params.set('page', targetPage)
+        return `/courses?${params.toString()}`
+    }
+    const links = {}
+    if (page < totalPages) {
+        links.nextPage = linkFor(page + 1)
+    }
+    if (page > 1 && totalPages > 0) {
+        links.prevPage = linkFor(page - 1)
+    }
+
+    return res.status(200).send({
+        courses: courses,
+        page: page,
+        pageSize: pageSize,
+        totalCount: totalCount,
+        totalPages: totalPages,
+        links: links
+    })
+})
 
 /*
  * POST /courses
