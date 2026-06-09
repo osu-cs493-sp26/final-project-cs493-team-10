@@ -2,7 +2,13 @@ import * as z from "zod"
 
 export const User = z.object({})
 
-export const Course = z.object({})
+export const Course = z.object({
+    subject_code: z.string().min(1),
+    number: z.int().positive(),
+    title: z.string().min(1),
+    term: z.string().min(1),
+    instructor_id: z.int().positive(),
+})
 
 export const Assignment = z.object({})
 
