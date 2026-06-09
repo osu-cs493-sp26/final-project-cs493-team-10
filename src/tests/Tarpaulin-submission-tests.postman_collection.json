@@ -1,0 +1,536 @@
+{
+  "info": {
+    "_postman_id": "e9ac9708-3744-499e-b9e7-f3f8c71bcd5d",
+    "name": "Tarpaulin-submission-tests",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "53946202",
+    "_collection_link": "https://go.postman.co/collection/53946202-e9ac9708-3744-499e-b9e7-f3f8c71bcd5d?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "submission-tests",
+      "item": [
+        {
+          "name": "get (many)",
+          "item": [
+            {
+              "name": "basic-success",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (misspelling)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissio",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissio"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (assign no exist)",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/30/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "30",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "cursor-success",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions?cursor=19",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "cursor",
+                      "value": "19"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "studentId-success",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions?studentId=2",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "studentId",
+                      "value": "2"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "studentId-cursor-success",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions?studentId=2&cursor=18",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ],
+                  "query": [
+                    {
+                      "key": "studentId",
+                      "value": "2"
+                    },
+                    {
+                      "key": "cursor",
+                      "value": "18"
+                    }
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "post",
+          "item": [
+            {
+              "name": "basic-success",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "a5d9c821-035e-41b2-984c-0a9164872af4",
+                      "src": "/Users/duncan/Documents/OSU_Work/CS493/Team 10 - Final Project Proposal - CS493.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (misspelling)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "a5d9c821-035e-41b2-984c-0a9164872af4",
+                      "src": "/Users/duncan/Documents/OSU_Work/CS493/Team 10 - Final Project Proposal - CS493.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissio",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissio"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (assign no exist)",
+              "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "a5d9c821-035e-41b2-984c-0a9164872af4",
+                      "src": "/Users/duncan/Documents/OSU_Work/CS493/Team 10 - Final Project Proposal - CS493.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://localhost:8000/assignments/30/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "30",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "update",
+          "item": [
+            {
+              "name": "basic-success",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-success (extra fields)",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (no body)",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24,\n    \"submitted_at\": \"2025-02-14T19:00:00.000Z\",\n    \"file_url\": \"bad/url/bad\",\n    \"plagiarism_score\": 31,\n    \"student_id\": 51,\n    \"assignment_id\": 74\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (misspelling)",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24,\n    \"submitted_at\": \"2025-02-14T19:00:00.000Z\",\n    \"file_url\": \"bad/url/bad\",\n    \"plagiarism_score\": 31,\n    \"student_id\": 51,\n    \"assignment_id\": 74\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissio",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissio"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (invalid JSON)",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24,\n    \"submitted_at\": \"2025-02-14T19:00:00.000Z\",\n    \"file_url\": \"bad/url/bad\",\n    \"plagiar\",,\n    \"student_id\": 51,\n    \"assignment_id\": 74\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (submis no exist)",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/59",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "59"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        },
+        {
+          "name": "get (download)",
+          "item": [
+            {
+              "name": "basic-success",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8000/media/submissions/496c48e1bb53157d5203cad191d93fd7",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "media",
+                    "submissions",
+                    "496c48e1bb53157d5203cad191d93fd7"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (misspelling)",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8000/media/submissio",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "media",
+                    "submissio"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (submis no exist)",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8000/media/submissions/496c48e1bb53157d",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "media",
+                    "submissions",
+                    "496c48e1bb53157d"
+                  ]
+                }
+              },
+              "response": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

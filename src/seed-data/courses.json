@@ -1,0 +1,142 @@
+[
+    {
+        "subject_code": "CS",
+        "number": 101,
+        "title": "Intro to Programming",
+        "term": "F2024",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 201,
+        "title": "Data Structures",
+        "term": "F2024",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 301,
+        "title": "Algorithms",
+        "term": "F2024",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "CS",
+        "number": 401,
+        "title": "Operating Systems",
+        "term": "F2024",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "MATH",
+        "number": 251,
+        "title": "Calculus I",
+        "term": "F2024",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "MATH",
+        "number": 252,
+        "title": "Calculus II",
+        "term": "W2025",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "CS",
+        "number": 493,
+        "title": "Cloud Application Development",
+        "term": "W2025",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 344,
+        "title": "Operating Systems I",
+        "term": "W2025",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "CS",
+        "number": 372,
+        "title": "Intro to Computer Networks",
+        "term": "W2025",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 467,
+        "title": "Capstone",
+        "term": "W2025",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "CS",
+        "number": 261,
+        "title": "Computer Architecture",
+        "term": "F2024",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 325,
+        "title": "Analysis of Algorithms",
+        "term": "F2024",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "MATH",
+        "number": 341,
+        "title": "Linear Algebra",
+        "term": "F2024",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "MATH",
+        "number": 265,
+        "title": "Discrete Mathematics",
+        "term": "F2024",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 340,
+        "title": "Introduction to Databases",
+        "term": "W2025",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 362,
+        "title": "Software Engineering II",
+        "term": "W2025",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "CS",
+        "number": 450,
+        "title": "Computer Graphics",
+        "term": "W2025",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 480,
+        "title": "Machine Learning",
+        "term": "W2025",
+        "instructor_id": 3
+    },
+    {
+        "subject_code": "MATH",
+        "number": 351,
+        "title": "Intro to Probability",
+        "term": "W2025",
+        "instructor_id": 2
+    },
+    {
+        "subject_code": "CS",
+        "number": 499,
+        "title": "Special Topics in AI",
+        "term": "W2025",
+        "instructor_id": 3
+    }
+]

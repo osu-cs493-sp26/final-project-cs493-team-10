@@ -1,0 +1,182 @@
+[
+    {
+        "submitted_at": "2024-09-30T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/1",
+        "file_name": "a3f8c2e1d4b7f9a0c5e2d8b1f3a6c9e0",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 1,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2024-09-30T21:00:00Z",
+        "file_url": "http://localhost:3000/submissions/2",
+        "file_name": "b1d4e7f2a5c8e3b6d9f0a2c5e8b1d4f7",
+        "plagiarism_score": 12,
+        "grade": null,
+        "assignment_id": 1,
+        "student_id": 2
+    },
+    {
+        "submitted_at": "2024-10-14T18:00:00Z",
+        "file_url": "http://localhost:3000/submissions/3",
+        "file_name": "c2e5f8a1d4b7e0c3f6a9d2b5e8c1f4a7",
+        "plagiarism_score": 5,
+        "grade": 95,
+        "assignment_id": 2,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2024-10-14T22:00:00Z",
+        "file_url": "http://localhost:3000/submissions/4",
+        "file_name": "d3f6a9b2e5c8f1a4d7b0e3c6f9a2d5b8",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 2,
+        "student_id": 6
+    },
+    {
+        "submitted_at": "2024-10-09T19:00:00Z",
+        "file_url": "http://localhost:3000/submissions/5",
+        "file_name": "e4a7b0c3f6d9e2b5a8c1f4d7e0b3a6c9",
+        "plagiarism_score": 30,
+        "grade": 80,
+        "assignment_id": 3,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2024-10-09T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/6",
+        "file_name": "f5b8c1d4e7a0f3b6c9d2e5a8f1b4c7d0",
+        "plagiarism_score": 8,
+        "grade": 92,
+        "assignment_id": 3,
+        "student_id": 7
+    },
+    {
+        "submitted_at": "2024-10-24T23:00:00Z",
+        "file_url": "http://localhost:3000/submissions/7",
+        "file_name": "a6c9d2e5f8b1a4c7d0e3f6b9c2d5e8a1",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 4,
+        "student_id": 4
+    },
+    {
+        "submitted_at": "2025-02-14T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/8",
+        "file_name": "b7d0e3f6a9c2b5d8e1f4a7c0d3e6f9b2",
+        "plagiarism_score": 15,
+        "grade": null,
+        "assignment_id": 10,
+        "student_id": 5
+    },
+    {
+        "submitted_at": "2025-02-14T21:00:00Z",
+        "file_url": "http://localhost:3000/submissions/9",
+        "file_name": "c8e1f4a7b0d3c6e9f2a5b8d1e4f7a0c3",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 10,
+        "student_id": 6
+    },
+    {
+        "submitted_at": "2025-03-14T23:00:00Z",
+        "file_url": "http://localhost:3000/submissions/10",
+        "file_name": "d9f2a5b8c1e4d7f0a3b6c9e2f5a8d1b4",
+        "plagiarism_score": 22,
+        "grade": 88,
+        "assignment_id": 9,
+        "student_id": 5
+    },
+    {
+        "submitted_at": "2024-10-24T19:00:00Z",
+        "file_url": "http://localhost:3000/submissions/11",
+        "file_name": "e0a3b6c9d2f5e8a1b4c7d0f3e6a9b2c5",
+        "plagiarism_score": 10,
+        "grade": 87,
+        "assignment_id": 4,
+        "student_id": 7
+    },
+    {
+        "submitted_at": "2024-10-31T22:00:00Z",
+        "file_url": "http://localhost:3000/submissions/12",
+        "file_name": "f1b4c7d0e3a6f9b2c5d8e1a4f7b0c3d6",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 5,
+        "student_id": 8
+    },
+    {
+        "submitted_at": "2024-10-31T23:00:00Z",
+        "file_url": "http://localhost:3000/submissions/13",
+        "file_name": "a2c5d8e1f4b7a0c3d6e9f2b5c8d1e4a7",
+        "plagiarism_score": 3,
+        "grade": 91,
+        "assignment_id": 5,
+        "student_id": 9
+    },
+    {
+        "submitted_at": "2024-11-14T20:00:00Z",
+        "file_url": "http://localhost:3000/submissions/14",
+        "file_name": "b3d6e9f2a5c8b1d4e7f0a3c6d9e2f5b8",
+        "plagiarism_score": 18,
+        "grade": 76,
+        "assignment_id": 6,
+        "student_id": 8
+    },
+    {
+        "submitted_at": "2024-11-14T21:00:00Z",
+        "file_url": "http://localhost:3000/submissions/15",
+        "file_name": "c4e7f0a3b6d9c2e5f8a1b4d7e0f3a6c9",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 6,
+        "student_id": 10
+    },
+    {
+        "submitted_at": "2024-11-04T18:00:00Z",
+        "file_url": "http://localhost:3000/submissions/16",
+        "file_name": "d5f8a1b4c7e0d3f6a9b2c5e8d1f4a7b0",
+        "plagiarism_score": 7,
+        "grade": 83,
+        "assignment_id": 7,
+        "student_id": 9
+    },
+    {
+        "submitted_at": "2024-11-19T22:00:00Z",
+        "file_url": "http://localhost:3000/submissions/17",
+        "file_name": "e6a9b2c5d8f1e4a7b0c3d6f9e2a5b8c1",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 8,
+        "student_id": 10
+    },
+    {
+        "submitted_at": "2024-11-19T23:00:00Z",
+        "file_url": "http://localhost:3000/submissions/18",
+        "file_name": "f7b0c3d6e9a2f5b8c1d4e7a0f3b6c9d2",
+        "plagiarism_score": 25,
+        "grade": 70,
+        "assignment_id": 1,
+        "student_id": 2
+    },
+    {
+        "submitted_at": "2025-03-14T21:00:00Z",
+        "file_url": "http://localhost:3000/submissions/19",
+        "file_name": "a8c1d4e7f0b3a6c9d2e5f8a1b4c7d0e3",
+        "plagiarism_score": null,
+        "grade": null,
+        "assignment_id": 1,
+        "student_id": 2
+    },
+    {
+        "submitted_at": "2025-02-14T19:00:00Z",
+        "file_url": "http://localhost:3000/submissions/20",
+        "file_name": "b9d2e5f8a1c4b7d0e3f6a9c2d5e8f1b4",
+        "plagiarism_score": 9,
+        "grade": 94,
+        "assignment_id": 1,
+        "student_id": 2
+    }
+]
