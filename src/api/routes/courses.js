@@ -322,6 +322,32 @@ router.get('/:id/students',
     }
 )
 
+/*
+ * GET /courses/{id}/assignments
+ * Public.  Returns the ids of all Assignments belonging to the Course.
+ */
+router.get('/:id/assignments', async (req, res, next) => {
+    const courseId = parseInt(req.params.id)
+    if (Number.isNaN(courseId)) {
+        return res.status(400).send({ error: "Invalid course id specified in the path" })
+    }
+
+    const course = await prisma.course.findUnique({ where: { id: courseId } })
+    if (!course) {
+        return next() // 404 handler
+    }
+
+    const assignments = await prisma.assignment.findMany({
+        where: { course_id: courseId },
+        orderBy: { id: 'asc' },
+        select: { id: true }
+    })
+
+    return res.status(200).send({
+        assignments: assignments.map(a => a.id)
+    })
+})
+
 // Wraps a CSV field in double quotes, escaping any embedded quotes (RFC 4180).
 function csvQuote(value) {
     return `"${String(value).replace(/"/g, '""')}"`
