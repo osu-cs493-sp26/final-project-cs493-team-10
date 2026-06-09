@@ -10,7 +10,12 @@ export const Course = z.object({
     instructor_id: z.int().positive(),
 })
 
-export const Assignment = z.object({})
+export const Assignment = z.object({
+    course_id: z.int().positive(),
+    title: z.string().min(1),
+    points: z.int().min(0),
+    due_date: z.iso.datetime({ offset: true }),
+})
 
 /**
  * don't need create submission schema, since no data aside from 
