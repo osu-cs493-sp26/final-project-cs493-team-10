@@ -2,7 +2,7 @@ import { Router } from 'express'
 
 import prisma from '../../lib/prisma.js'
 import { PAGE_SIZE } from '../../constants.js'
-import { Course } from '../../lib/zod.js'
+import { Course, EnrollmentUpdate } from '../../lib/zod.js'
 // TODO: swap for `../../lib/auth.js` once Calvin pushes the real JWT middleware.
 import { requireAuthentication } from '../../lib/dev-auth.js'
 
@@ -210,6 +210,76 @@ router.delete('/:id',
 
         await prisma.course.delete({ where: { id: id } })
         return res.status(204).send()
+    }
+)
+
+/*
+ * POST /courses/{id}/students
+ * Enroll and/or unenroll students in a Course.  Only an admin or the course's
+ * owning instructor may do this.  Body: { add: [ids], remove: [ids] }.
+ */
+router.post('/:id/students',
+    requireAuthentication,
+    async (req, res, next) => {
+        const courseId = parseInt(req.params.id)
+        if (Number.isNaN(courseId)) {
+            return res.status(400).send({ error: "Invalid course id specified in the path" })
+        }
+
+        const course = await prisma.course.findUnique({ where: { id: courseId } })
+        if (!course) {
+            return next() // 404 handler
+        }
+
+        const requester = await prisma.user.findUnique({ where: { id: req.user } })
+        const authorized = requester && (
+            requester.role === 'admin' ||
+            (requester.role === 'instructor' && requester.id === course.instructor_id)
+        )
+        if (!authorized) {
+            return res.status(403).send({ error: "Only an admin or the course's instructor can update enrollment" })
+        }
+
+        const { add = [], remove = [] } = EnrollmentUpdate.parse(req.body)
+        if (add.length === 0 && remove.length === 0) {
+            return res.status(400).send({ error: "Request body must contain an 'add' and/or 'remove' array of student ids" })
+        }
+
+        // A contradictory request (same id in both lists) is rejected.
+        const overlap = add.filter(id => remove.includes(id))
+        if (overlap.length > 0) {
+            return res.status(400).send({ error: `Student id(s) cannot appear in both add and remove: ${overlap.join(", ")}` })
+        }
+
+        // Every id in `add` must reference an existing User with the student role.
+        if (add.length > 0) {
+            const students = await prisma.user.findMany({
+                where: { id: { in: add }, role: 'student' },
+                select: { id: true }
+            })
+            const validIds = new Set(students.map(s => s.id))
+            const invalid = add.filter(id => !validIds.has(id))
+            if (invalid.length > 0) {
+                return res.status(400).send({ error: `add must reference existing student users; invalid id(s): ${invalid.join(", ")}` })
+            }
+        }
+
+        // Apply atomically: removals first, then additions (skipping any that
+        // are already enrolled).
+        const [removeResult, addResult] = await prisma.$transaction([
+            prisma.courseStudent.deleteMany({
+                where: { course_id: courseId, student_id: { in: remove } }
+            }),
+            prisma.courseStudent.createMany({
+                data: add.map(id => ({ course_id: courseId, student_id: id })),
+                skipDuplicates: true
+            })
+        ])
+
+        return res.status(200).send({
+            added: addResult.count,
+            removed: removeResult.count
+        })
     }
 )
 

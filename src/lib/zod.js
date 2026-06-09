@@ -17,6 +17,12 @@ export const Assignment = z.object({
     due_date: z.iso.datetime({ offset: true }),
 })
 
+// used to validate the enrollment-update body for POST /courses/{id}/students
+export const EnrollmentUpdate = z.object({
+    add: z.array(z.int().positive()).optional(),
+    remove: z.array(z.int().positive()).optional(),
+})
+
 /**
  * don't need create submission schema, since no data aside from 
  * assignmentID (a route path param) and file upload is needed in creation
