@@ -5,6 +5,7 @@ import { createClient } from '@supabase/supabase-js'
 
 import { PAGE_SIZE } from '../../constants.js'
 import prisma from '../../lib/prisma.js'
+import submissionQueue from '../../lib/submission-queue.js'
 
 const router = Router()
 
@@ -120,7 +121,19 @@ router.post('/:id/submissions',
 
         const submission = await prisma.submission.create({ data: data })
 
-        // TODO: Add job to redis queue for plagiarism score
+        await submissionQueue.add(
+            {
+                submissionId: submission.id,
+                submissionFileName: filename
+            },
+            {
+                attempts: 3,           // retry up to 3 times
+                backoff: {
+                    type: 'exponential',
+                    delay: 1000        // wait 1s, 2s, 4s between retries
+                }
+            }
+        )
 
         return res.status(201).send({ id: submission.id })
     }
