@@ -30,17 +30,35 @@ submissionQueue.process(async (job) => {
         .from('file-buck')
         .download(`${submissionFileName}`)
     if (downloadError) {
-        throw new Error(`Failed to download file: ${downloadError.message}`)
+        throw new Error(`Failed to download file: ${downloadError.message}`) // bull handles error
     }
     const arrayBuffer = await downloadData.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
 
-    // TODO: upload file to plagiarism detection service and get plagiarism score
-    let plagiarismScore = 0
+    // format data to send to plagiarism detection service
+    const formData = new FormData()
+    const blob = new Blob(
+        [await downloadData.arrayBuffer()],
+        {
+            type: downloadData.type
+        })
+    formData.append('submission', blob) // add field called submission to form-data
+
+    // upload file to plagiarism detection service and get plagiarism score
+    const plagiarismResponse = await fetch('https://web.engr.oregonstate.edu/~hessro/api/plagiarism.php', {
+        method: 'POST',
+        body: formData
+    })
+    if (!plagiarismResponse.ok) {
+        throw new Error(`Plagiarism API failed: ${plagiarismResponse.status}`) // bull handles error
+    }
+
+    const plagiarismData = await plagiarismResponse.json()
+    console.log(`Received plagiarism data for submission ${submissionId}:`, plagiarismData)
 
     // update submission with plagiarism score
     await prisma.submission.update({
         where: { id: submissionId },
-        data: { plagiarism_score: plagiarismScore }
+        data: { plagiarism_score: plagiarismData.score }
     })
 })
