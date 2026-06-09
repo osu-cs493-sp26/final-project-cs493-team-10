@@ -283,4 +283,93 @@ router.post('/:id/students',
     }
 )
 
+/*
+ * GET /courses/{id}/students
+ * Returns the ids of the students enrolled in the Course.  Only an admin or
+ * the course's owning instructor may fetch this.
+ */
+router.get('/:id/students',
+    requireAuthentication,
+    async (req, res, next) => {
+        const courseId = parseInt(req.params.id)
+        if (Number.isNaN(courseId)) {
+            return res.status(400).send({ error: "Invalid course id specified in the path" })
+        }
+
+        const course = await prisma.course.findUnique({ where: { id: courseId } })
+        if (!course) {
+            return next() // 404 handler
+        }
+
+        const requester = await prisma.user.findUnique({ where: { id: req.user } })
+        const authorized = requester && (
+            requester.role === 'admin' ||
+            (requester.role === 'instructor' && requester.id === course.instructor_id)
+        )
+        if (!authorized) {
+            return res.status(403).send({ error: "Only an admin or the course's instructor can view the enrolled students" })
+        }
+
+        const enrollments = await prisma.courseStudent.findMany({
+            where: { course_id: courseId },
+            orderBy: { student_id: 'asc' },
+            select: { student_id: true }
+        })
+
+        return res.status(200).send({
+            students: enrollments.map(e => e.student_id)
+        })
+    }
+)
+
+// Wraps a CSV field in double quotes, escaping any embedded quotes (RFC 4180).
+function csvQuote(value) {
+    return `"${String(value).replace(/"/g, '""')}"`
+}
+
+/*
+ * GET /courses/{id}/roster
+ * Returns a CSV roster of the students enrolled in the Course (id, name,
+ * email).  Only an admin or the course's owning instructor may fetch this.
+ */
+router.get('/:id/roster',
+    requireAuthentication,
+    async (req, res, next) => {
+        const courseId = parseInt(req.params.id)
+        if (Number.isNaN(courseId)) {
+            return res.status(400).send({ error: "Invalid course id specified in the path" })
+        }
+
+        const course = await prisma.course.findUnique({ where: { id: courseId } })
+        if (!course) {
+            return next() // 404 handler
+        }
+
+        const requester = await prisma.user.findUnique({ where: { id: req.user } })
+        const authorized = requester && (
+            requester.role === 'admin' ||
+            (requester.role === 'instructor' && requester.id === course.instructor_id)
+        )
+        if (!authorized) {
+            return res.status(403).send({ error: "Only an admin or the course's instructor can download the roster" })
+        }
+
+        const enrollments = await prisma.courseStudent.findMany({
+            where: { course_id: courseId },
+            orderBy: { student_id: 'asc' },
+            include: { student: true }
+        })
+
+        const csv = enrollments
+            .map(({ student }) => `${student.id},${csvQuote(student.name)},${csvQuote(student.email)}`)
+            .join("\n")
+
+        res.set({
+            'Content-Type': 'text/csv',
+            'Content-Disposition': `attachment; filename="course-${courseId}-roster.csv"`
+        })
+        return res.status(200).send(csv)
+    }
+)
+
 export default router
