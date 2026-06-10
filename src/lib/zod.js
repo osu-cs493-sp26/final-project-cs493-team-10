@@ -1,17 +1,21 @@
 import * as z from "zod"
 
-export const User = z.object({})
+const RoleSchema = z.enum(['admin', 'instructor', 'student'])
 
-export const Course = z.object({})
+// passwords are accepted only as input and are hashed before persistence
+export const CreateUserSchema = z.object({
+    name: z.string().trim().min(1),
+    email: z.string().trim().email(),
+    password: z.string().min(1),
+    role: RoleSchema.default('student')
+})
 
-export const Assignment = z.object({})
+export const LoginSchema = z.object({
+    email: z.string().trim().email(),
+    password: z.string().min(1)
+})
 
-/**
- * don't need create submission schema, since no data aside from 
- * assignmentID (a route path param) and file upload is needed in creation
- */
-
-// used to validate the grade assignment in the update submission endpoint
+// submission creation uses a path ID and multipart file, so only updates need JSON validation
 export const UpdateSubmissionSchema = z.object({
-    grade: z.int().min(0).max(100),
+    grade: z.number().finite().min(0),
 })
