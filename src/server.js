@@ -18,9 +18,12 @@ app.use('/', api)
 
 app.use((err, req, res, next) => {
     if (err instanceof z.ZodError) {
-        res.status(400).send({ err: z.prettifyError(err) })
+        res.status(400).send({ error: z.prettifyError(err) })
     } else if (err instanceof PrismaClientValidationError) {
-        res.status(400).send({ err: err.message })
+        res.status(400).send({ error: err.message })
+    } else if (err instanceof PrismaClientKnownRequestError && err.code === "P2002") {
+        // convert unique constraint failures, such as duplicate emails, to 400s
+        res.status(400).send({ error: "A unique field already exists" })
     } else if (err instanceof PrismaClientKnownRequestError && err.code === "P2003") {
         /*
          * "P2003" means an operation failed because of an invalid foreign key:
@@ -29,7 +32,7 @@ app.use((err, req, res, next) => {
          * new database records, when an invalid foreign key is specified in
          * the request body.  We'll respond with a 400 error.
          */
-        res.status(400).send({ err: err.message })
+        res.status(400).send({ error: err.message })
     } else if (err instanceof PrismaClientKnownRequestError && err.code === "P2025") {
         /*
          * "P2025" means an operation failed because a specified record was
@@ -41,7 +44,7 @@ app.use((err, req, res, next) => {
         return res.status(400).send({ error: "Invalid JSON in request body" })
     } else {
         console.error(err)
-        res.status(500).send(err)
+        res.status(500).send({ error: "Internal server error" })
     }
 })
 
