@@ -11,23 +11,8 @@ import {
     authenticate,
     canManageCourse
 } from '../../lib/auth.js'
-// TODO: Bailey's assignment-CRUD routes below still use this dev shim. Migrate
-// them to `authenticate` from ../../lib/auth.js (note: req.user is now
-// { id, role }) and then delete dev-auth.js.
-import { requireAuthentication } from '../../lib/dev-auth.js'
 
 const router = Router()
-
-/*
- * Returns true if the User (by id) may manage Assignments in the given Course,
- * i.e. they are an admin or the instructor who owns that Course.
- */
-async function canManageCourseAssignments(userId, course) {
-    const user = await prisma.user.findUnique({ where: { id: userId } })
-    if (!user) return false
-    if (user.role === 'admin') return true
-    return !!course && user.role === 'instructor' && user.id === course.instructor_id
-}
 
 // multer configuration for handling file uploads to memory storage
 const fileUploadHandler = multer({
@@ -223,7 +208,7 @@ router.post('/:id/submissions',
  * Course referenced by course_id may do this.
  */
 router.post('/',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const data = Assignment.parse(req.body)
 
@@ -232,7 +217,7 @@ router.post('/',
             return res.status(400).send({ error: "course_id must reference an existing course" })
         }
 
-        if (!(await canManageCourseAssignments(req.user, course))) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can create an assignment for this course" })
         }
 
@@ -266,7 +251,7 @@ router.get('/:id', async (req, res, next) => {
  * Assignment's course_id is immutable and cannot be changed here.
  */
 router.patch('/:id',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const id = parseInt(req.params.id)
         if (Number.isNaN(id)) {
@@ -279,7 +264,7 @@ router.patch('/:id',
         }
 
         const course = await prisma.course.findUnique({ where: { id: assignment.course_id } })
-        if (!(await canManageCourseAssignments(req.user, course))) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can update this assignment" })
         }
 
@@ -303,7 +288,7 @@ router.patch('/:id',
  * Submissions are removed via the schema's cascade rules.
  */
 router.delete('/:id',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const id = parseInt(req.params.id)
         if (Number.isNaN(id)) {
@@ -316,7 +301,7 @@ router.delete('/:id',
         }
 
         const course = await prisma.course.findUnique({ where: { id: assignment.course_id } })
-        if (!(await canManageCourseAssignments(req.user, course))) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can delete this assignment" })
         }
 

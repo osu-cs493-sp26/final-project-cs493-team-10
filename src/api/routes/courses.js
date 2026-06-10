@@ -3,8 +3,7 @@ import { Router } from 'express'
 import prisma from '../../lib/prisma.js'
 import { PAGE_SIZE } from '../../constants.js'
 import { Course, EnrollmentUpdate } from '../../lib/zod.js'
-// TODO: swap for `../../lib/auth.js` once Calvin pushes the real JWT middleware.
-import { requireAuthentication } from '../../lib/dev-auth.js'
+import { authenticate, canManageCourse } from '../../lib/auth.js'
 
 const router = Router()
 
@@ -91,10 +90,9 @@ router.get('/', async (req, res, next) => {
  * 'instructor' role.
  */
 router.post('/',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
-        const requester = await prisma.user.findUnique({ where: { id: req.user } })
-        if (!requester || requester.role !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(403).send({ error: "Only an admin can create a course" })
         }
 
@@ -146,7 +144,7 @@ router.get('/:id', async (req, res, next) => {
  * modified through this endpoint.
  */
 router.patch('/:id',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const id = parseInt(req.params.id)
         if (Number.isNaN(id)) {
@@ -158,12 +156,7 @@ router.patch('/:id',
             return next() // 404 handler
         }
 
-        const requester = await prisma.user.findUnique({ where: { id: req.user } })
-        const authorized = requester && (
-            requester.role === 'admin' ||
-            (requester.role === 'instructor' && requester.id === course.instructor_id)
-        )
-        if (!authorized) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can update this course" })
         }
 
@@ -191,15 +184,14 @@ router.patch('/:id',
  * Assignments and enrollments are removed via the schema's cascade rules.
  */
 router.delete('/:id',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const id = parseInt(req.params.id)
         if (Number.isNaN(id)) {
             return res.status(400).send({ error: "Invalid course id specified in the path" })
         }
 
-        const requester = await prisma.user.findUnique({ where: { id: req.user } })
-        if (!requester || requester.role !== 'admin') {
+        if (req.user.role !== 'admin') {
             return res.status(403).send({ error: "Only an admin can delete a course" })
         }
 
@@ -219,7 +211,7 @@ router.delete('/:id',
  * owning instructor may do this.  Body: { add: [ids], remove: [ids] }.
  */
 router.post('/:id/students',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const courseId = parseInt(req.params.id)
         if (Number.isNaN(courseId)) {
@@ -231,12 +223,7 @@ router.post('/:id/students',
             return next() // 404 handler
         }
 
-        const requester = await prisma.user.findUnique({ where: { id: req.user } })
-        const authorized = requester && (
-            requester.role === 'admin' ||
-            (requester.role === 'instructor' && requester.id === course.instructor_id)
-        )
-        if (!authorized) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can update enrollment" })
         }
 
@@ -289,7 +276,7 @@ router.post('/:id/students',
  * the course's owning instructor may fetch this.
  */
 router.get('/:id/students',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const courseId = parseInt(req.params.id)
         if (Number.isNaN(courseId)) {
@@ -301,12 +288,7 @@ router.get('/:id/students',
             return next() // 404 handler
         }
 
-        const requester = await prisma.user.findUnique({ where: { id: req.user } })
-        const authorized = requester && (
-            requester.role === 'admin' ||
-            (requester.role === 'instructor' && requester.id === course.instructor_id)
-        )
-        if (!authorized) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can view the enrolled students" })
         }
 
@@ -359,7 +341,7 @@ function csvQuote(value) {
  * email).  Only an admin or the course's owning instructor may fetch this.
  */
 router.get('/:id/roster',
-    requireAuthentication,
+    authenticate,
     async (req, res, next) => {
         const courseId = parseInt(req.params.id)
         if (Number.isNaN(courseId)) {
@@ -371,12 +353,7 @@ router.get('/:id/roster',
             return next() // 404 handler
         }
 
-        const requester = await prisma.user.findUnique({ where: { id: req.user } })
-        const authorized = requester && (
-            requester.role === 'admin' ||
-            (requester.role === 'instructor' && requester.id === course.instructor_id)
-        )
-        if (!authorized) {
+        if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can download the roster" })
         }
 
