@@ -53,7 +53,7 @@ model Submission {
     file_name        String   @unique // the name of the file in supabase (not the original name)
     file_url         String // URL link to Supabase where the file is stored at
     plagiarism_score Int?
-    grade            Int?
+    grade            Float?
     assignment_id    Int
     student_id       Int
 

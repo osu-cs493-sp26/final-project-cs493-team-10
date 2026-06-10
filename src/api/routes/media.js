@@ -1,10 +1,11 @@
 import { Router } from 'express'
-import multer from 'multer'
 import { createClient } from '@supabase/supabase-js'
 
-import { PAGE_SIZE } from '../../constants.js'
 import prisma from '../../lib/prisma.js'
-import { UpdateSubmissionSchema } from '../../lib/zod.js'
+import {
+    authenticate,
+    canManageCourse
+} from '../../lib/auth.js'
 
 const router = Router()
 
@@ -14,22 +15,33 @@ const supabase = createClient(
 )
 
 router.get('/submissions/:filename',
-    // TODO: add auth middleware function call
+    authenticate,
     async (req, res) => {
         const fileName = req.params.filename
 
-        // TODO: early return if user is not admin or instructor of the course this assignment belonds to
-        //      REQUIRES: AUTH
-
-        // match filename to unique db entry
+        // load course ownership data before reading the file from storage
         const submission = await prisma.submission.findUnique({
-            where: { file_name: fileName }
+            where: { file_name: fileName },
+            include: {
+                assignment: {
+                    include: {
+                        course: {
+                            select: { instructor_id: true }
+                        }
+                    }
+                }
+            }
         })
         if (!submission) {
             return res.status(404).send({ error: "No submission found with the specified file name" })
         }
+        if (!canManageCourse(req.user, submission.assignment.course)) {
+            return res.status(403).send({
+                error: 'Only an admin or the course instructor can download a submission'
+            })
+        }
 
-        // download file from supabase
+        // download only after the caller has passed the ownership check
         const { data: downloadData, error: downloadError } = await supabase.storage
             .from('file-buck')
             .download(submission.file_name)
