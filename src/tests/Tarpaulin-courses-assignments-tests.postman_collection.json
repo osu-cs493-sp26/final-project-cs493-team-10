@@ -1,6 +1,7 @@
 {
   "info": {
-    "name": "Tarpaulin-courses-assignments-DEMO",
+    "name": "Tarpaulin-courses-assignments-tests",
+    "description": "Tests for Bailey's scope: Course CRUD, filtering/pagination, enrollment, students list, roster CSV, course assignments list, and Assignment CRUD. Auth uses Calvin's JWT middleware via the 'setup - login' folder. All mutations target a throwaway course + assignment created at the start and deleted in 'teardown - cleanup', so the original seed data is only ever READ — nothing is left modified. Run top-to-bottom against a freshly-seeded DB.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
@@ -15,7 +16,7 @@
   "item": [
     {
       "name": "setup - login (run first)",
-      "description": "Logs in seeded users and stores their JWTs as collection variables. admin=alice, owning instructor=bob (teaches course 1), non-owning instructor=carol, student=dave. All seeded passwords are 'password'.",
+      "description": "Logs in seeded users and stores their JWTs as collection variables. admin=alice, owning instructor=bob (teaches the temp course), non-owning instructor=carol, student=dave. All seeded passwords are 'password'.",
       "item": [
         {
           "name": "login admin (alice)",
@@ -26,7 +27,7 @@
           "response": []
         },
         {
-          "name": "login instructor (bob, owns course 1)",
+          "name": "login instructor (bob, owns the temp course)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('200 + token', () => { pm.response.to.have.status(200); pm.collectionVariables.set('instructorToken', pm.response.json().token); });"
           ] } } ],
@@ -34,7 +35,7 @@
           "response": []
         },
         {
-          "name": "login other instructor (carol, no course 1)",
+          "name": "login other instructor (carol, does not own it)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('200 + token', () => { pm.response.to.have.status(200); pm.collectionVariables.set('otherInstructorToken', pm.response.json().token); });"
           ] } } ],
@@ -53,10 +54,10 @@
     },
     {
       "name": "courses",
-      "description": "Course CRUD, list filtering + pagination, enrollment, students list, and roster CSV. Public reads need no token; create/delete are admin-only; update/enroll/students/roster are admin OR the course's own instructor.",
+      "description": "Course list filtering + pagination and CRUD. Reads (list, filters, GET /courses/1) hit seed data and never modify it. Create/edit/enroll all target a throwaway course captured in createdCourseId. Public reads need no token; create/delete are admin-only; update/enroll/students/roster are admin OR the course's own instructor.",
       "item": [
         {
-          "name": "GET /courses — paginated list (public)",
+          "name": "GET /courses — paginated list (public, read-only)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
             "pm.test('200 + paginated courses', () => { pm.response.to.have.status(200); pm.expect(j.courses).to.be.an('array'); pm.expect(j.totalPages).to.be.a('number'); });"
@@ -65,12 +66,30 @@
           "response": []
         },
         {
-          "name": "GET /courses?subject=MATH — filtering (public)",
+          "name": "GET /courses?subject=MATH — filter by subject (public)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
-            "pm.test('200 + only MATH courses', () => { pm.response.to.have.status(200); j.courses.forEach(c => pm.expect(c.subject_code).to.eql('MATH')); });"
+            "pm.test('200 + only MATH courses', () => { pm.response.to.have.status(200); j.courses.forEach(c => pm.expect(c.subject).to.eql('MATH')); });"
           ] } } ],
           "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses?subject=MATH", "host": ["{{baseUrl}}"], "path": ["courses"], "query": [ { "key": "subject", "value": "MATH" } ] } },
+          "response": []
+        },
+        {
+          "name": "GET /courses?number=101 — filter by number (public)",
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const j = pm.response.json();",
+            "pm.test('200 + only number-101 courses', () => { pm.response.to.have.status(200); j.courses.forEach(c => pm.expect(c.number).to.eql(101)); });"
+          ] } } ],
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses?number=101", "host": ["{{baseUrl}}"], "path": ["courses"], "query": [ { "key": "number", "value": "101" } ] } },
+          "response": []
+        },
+        {
+          "name": "GET /courses?term=W2025 — filter by term (public)",
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "const j = pm.response.json();",
+            "pm.test('200 + only W2025 courses', () => { pm.response.to.have.status(200); j.courses.forEach(c => pm.expect(c.term).to.eql('W2025')); });"
+          ] } } ],
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses?term=W2025", "host": ["{{baseUrl}}"], "path": ["courses"], "query": [ { "key": "term", "value": "W2025" } ] } },
           "response": []
         },
         {
@@ -83,27 +102,27 @@
           "response": []
         },
         {
-          "name": "GET /courses?term=W2025 — filtering by term (public)",
+          "name": "GET /courses/1 — detail + counts (public, seed read-only)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
-            "pm.test('200 + only W2025 courses', () => { pm.response.to.have.status(200); j.courses.forEach(c => pm.expect(c.term).to.eql('W2025')); });"
+            "pm.test('200 + studentCount/assignmentCount + camelCase fields', () => { pm.response.to.have.status(200); pm.expect(j.studentCount).to.be.a('number'); pm.expect(j.assignmentCount).to.be.a('number'); pm.expect(j.subject).to.be.a('string'); pm.expect(j.instructorId).to.be.a('number'); });"
           ] } } ],
-          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses?term=W2025", "host": ["{{baseUrl}}"], "path": ["courses"], "query": [ { "key": "term", "value": "W2025" } ] } },
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses/1", "host": ["{{baseUrl}}"], "path": ["courses", "1"] } },
           "response": []
         },
         {
-          "name": "POST /courses — admin creates (201)",
+          "name": "POST /courses — admin creates temp course (201)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('201 + id', () => { pm.response.to.have.status(201); pm.collectionVariables.set('createdCourseId', pm.response.json().id); });"
           ] } } ],
-          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "body": { "mode": "raw", "raw": "{\"subject_code\":\"CS\",\"number\":493,\"title\":\"Cloud Application Development\",\"term\":\"S2025\",\"instructor_id\":2}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] } },
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "body": { "mode": "raw", "raw": "{\"subject\":\"CS\",\"number\":493,\"title\":\"Temp Demo Course\",\"term\":\"S2025\",\"instructorId\":2}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] } },
           "response": []
         },
         {
           "name": "GET /courses/{{createdCourseId}} — confirm the create",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
-            "pm.test('200 + returns the course just created', () => { pm.response.to.have.status(200); pm.expect(j.subject_code).to.eql('CS'); pm.expect(j.number).to.eql(493); pm.expect(j.title).to.eql('Cloud Application Development'); });"
+            "pm.test('200 + returns the temp course (camelCase)', () => { pm.response.to.have.status(200); pm.expect(j.subject).to.eql('CS'); pm.expect(j.number).to.eql(493); pm.expect(j.title).to.eql('Temp Demo Course'); pm.expect(j.instructorId).to.eql(2); });"
           ] } } ],
           "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}"] } },
           "response": []
@@ -113,103 +132,93 @@
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('403', () => pm.response.to.have.status(403));"
           ] } } ],
-          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentToken}}" } ], "body": { "mode": "raw", "raw": "{\"subject_code\":\"CS\",\"number\":494,\"title\":\"X\",\"term\":\"S2025\",\"instructor_id\":2}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] } },
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentToken}}" } ], "body": { "mode": "raw", "raw": "{\"subject\":\"CS\",\"number\":494,\"title\":\"X\",\"term\":\"S2025\",\"instructorId\":2}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses", "host": ["{{baseUrl}}"], "path": ["courses"] } },
           "response": []
         },
         {
-          "name": "GET /courses/1 — detail + counts (public)",
-          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "const j = pm.response.json();",
-            "pm.test('200 + studentCount/assignmentCount', () => { pm.response.to.have.status(200); pm.expect(j.studentCount).to.be.a('number'); pm.expect(j.assignmentCount).to.be.a('number'); });"
-          ] } } ],
-          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses/1", "host": ["{{baseUrl}}"], "path": ["courses", "1"] } },
-          "response": []
-        },
-        {
-          "name": "PATCH /courses/1 — owner instructor edits (200)",
+          "name": "PATCH /courses/{{createdCourseId}} — owner instructor edits (200)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('200', () => pm.response.to.have.status(200));"
           ] } } ],
-          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"title\":\"Intro to Programming (edited)\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/1", "host": ["{{baseUrl}}"], "path": ["courses", "1"] } },
+          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"title\":\"Temp Demo Course (edited)\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}"] } },
           "response": []
         },
         {
-          "name": "GET /courses/1 — confirm the edit applied",
+          "name": "GET /courses/{{createdCourseId}} — confirm the edit applied",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
-            "pm.test('200 + title reflects the PATCH', () => { pm.response.to.have.status(200); pm.expect(j.title).to.eql('Intro to Programming (edited)'); });"
+            "pm.test('200 + title reflects the PATCH', () => { pm.response.to.have.status(200); pm.expect(j.title).to.eql('Temp Demo Course (edited)'); });"
           ] } } ],
-          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses/1", "host": ["{{baseUrl}}"], "path": ["courses", "1"] } },
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}"] } },
           "response": []
         },
         {
-          "name": "PATCH /courses/1 — non-owner instructor forbidden (403)",
+          "name": "PATCH /courses/{{createdCourseId}} — non-owner instructor forbidden (403)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('403', () => pm.response.to.have.status(403));"
           ] } } ],
-          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{otherInstructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"title\":\"nope\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/1", "host": ["{{baseUrl}}"], "path": ["courses", "1"] } },
+          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{otherInstructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"title\":\"nope\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}"] } },
           "response": []
         },
         {
-          "name": "POST /courses/1/students — enroll + unenroll (200)",
+          "name": "POST /courses/{{createdCourseId}}/students — enroll students (200)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "const j = pm.response.json();",
-            "pm.test('200 + added/removed counts', () => { pm.response.to.have.status(200); pm.expect(j.added).to.be.a('number'); pm.expect(j.removed).to.be.a('number'); });"
+            "pm.test('200 + added 3', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().added).to.eql(3); });"
           ] } } ],
-          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "body": { "mode": "raw", "raw": "{\"add\":[11,12],\"remove\":[4]}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/1/students", "host": ["{{baseUrl}}"], "path": ["courses", "1", "students"] } },
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "body": { "mode": "raw", "raw": "{\"add\":[4,5,6]}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}/students", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}", "students"] } },
           "response": []
         },
         {
-          "name": "GET /courses/1/students — enrolled ids (owner/admin)",
+          "name": "POST /courses/{{createdCourseId}}/students — unenroll one (200)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "pm.test('200 + students array', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().students).to.be.an('array'); });"
+            "pm.test('200 + removed 1', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().removed).to.eql(1); });"
           ] } } ],
-          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "url": { "raw": "{{baseUrl}}/courses/1/students", "host": ["{{baseUrl}}"], "path": ["courses", "1", "students"] } },
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"remove\":[6]}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}/students", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}", "students"] } },
           "response": []
         },
         {
-          "name": "GET /courses/1/roster — CSV download (owner/admin)",
+          "name": "GET /courses/{{createdCourseId}}/students — enrolled ids (owner/admin)",
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('200 + students are [4,5]', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().students).to.eql([4, 5]); });"
+          ] } } ],
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}/students", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}", "students"] } },
+          "response": []
+        },
+        {
+          "name": "GET /courses/{{createdCourseId}}/roster — CSV download (owner/admin)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('200 + text/csv', () => { pm.response.to.have.status(200); pm.expect(pm.response.headers.get('Content-Type')).to.include('text/csv'); });"
           ] } } ],
-          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "url": { "raw": "{{baseUrl}}/courses/1/roster", "host": ["{{baseUrl}}"], "path": ["courses", "1", "roster"] } },
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}/roster", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}", "roster"] } },
           "response": []
         },
         {
-          "name": "GET /courses/1/assignments — assignment ids (public)",
+          "name": "GET /courses/1/assignments — assignment ids (public, seed read-only)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('200 + assignments array', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().assignments).to.be.an('array'); });"
           ] } } ],
           "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/courses/1/assignments", "host": ["{{baseUrl}}"], "path": ["courses", "1", "assignments"] } },
-          "response": []
-        },
-        {
-          "name": "DELETE /courses — admin deletes created (204)",
-          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "pm.test('204', () => pm.response.to.have.status(204));"
-          ] } } ],
-          "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}"] } },
           "response": []
         }
       ]
     },
     {
       "name": "assignments",
-      "description": "Assignment CRUD. Public reads; create/update/delete are admin OR the instructor who owns the assignment's course. course_id is immutable on update.",
+      "description": "Assignment CRUD. The GET /assignments/1 read hits seed data only. Create/edit/delete all target a throwaway assignment (createdAssignmentId) that belongs to the temp course, so seed assignments are never modified. courseId is immutable on update.",
       "item": [
         {
-          "name": "POST /assignments — owner instructor creates (201)",
+          "name": "POST /assignments — owner creates on temp course (201)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('201 + id', () => { pm.response.to.have.status(201); pm.collectionVariables.set('createdAssignmentId', pm.response.json().id); });"
           ] } } ],
-          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"course_id\":1,\"title\":\"Final Project\",\"points\":100,\"due_date\":\"2025-06-10T23:59:00Z\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments", "host": ["{{baseUrl}}"], "path": ["assignments"] } },
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"courseId\":{{createdCourseId}},\"title\":\"Final Project\",\"points\":100,\"due\":\"2025-06-10T23:59:00Z\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments", "host": ["{{baseUrl}}"], "path": ["assignments"] } },
           "response": []
         },
         {
           "name": "GET /assignments/{{createdAssignmentId}} — confirm the create",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
-            "pm.test('200 + returns the assignment just created', () => { pm.response.to.have.status(200); pm.expect(j.title).to.eql('Final Project'); pm.expect(j.points).to.eql(100); pm.expect(j.course_id).to.eql(1); });"
+            "pm.test('200 + returns the temp assignment (camelCase)', () => { pm.response.to.have.status(200); pm.expect(j.title).to.eql('Final Project'); pm.expect(j.points).to.eql(100); pm.expect(j.courseId).to.be.a('number'); pm.expect(j.due).to.be.a('string'); });"
           ] } } ],
           "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}", "host": ["{{baseUrl}}"], "path": ["assignments", "{{createdAssignmentId}}"] } },
           "response": []
@@ -219,49 +228,62 @@
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('403', () => pm.response.to.have.status(403));"
           ] } } ],
-          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentToken}}" } ], "body": { "mode": "raw", "raw": "{\"course_id\":1,\"title\":\"X\",\"points\":10,\"due_date\":\"2025-06-01T23:59:00Z\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments", "host": ["{{baseUrl}}"], "path": ["assignments"] } },
+          "request": { "method": "POST", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{studentToken}}" } ], "body": { "mode": "raw", "raw": "{\"courseId\":{{createdCourseId}},\"title\":\"X\",\"points\":10,\"due\":\"2025-06-01T23:59:00Z\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments", "host": ["{{baseUrl}}"], "path": ["assignments"] } },
           "response": []
         },
         {
-          "name": "GET /assignments/1 — detail (public)",
+          "name": "GET /assignments/1 — detail (public, seed read-only)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "const j = pm.response.json();",
-            "pm.test('200 + no submissions field', () => { pm.response.to.have.status(200); pm.expect(j).to.not.have.property('submissions'); });"
+            "pm.test('200 + camelCase + no submissions field', () => { pm.response.to.have.status(200); pm.expect(j.courseId).to.be.a('number'); pm.expect(j.due).to.be.a('string'); pm.expect(j).to.not.have.property('submissions'); });"
           ] } } ],
           "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/assignments/1", "host": ["{{baseUrl}}"], "path": ["assignments", "1"] } },
           "response": []
         },
         {
-          "name": "PATCH /assignments/1 — owner edits (200)",
+          "name": "PATCH /assignments/{{createdAssignmentId}} — owner edits (200)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('200', () => pm.response.to.have.status(200));"
           ] } } ],
-          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"points\":120}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments/1", "host": ["{{baseUrl}}"], "path": ["assignments", "1"] } },
+          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{instructorToken}}" } ], "body": { "mode": "raw", "raw": "{\"points\":120}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}", "host": ["{{baseUrl}}"], "path": ["assignments", "{{createdAssignmentId}}"] } },
           "response": []
         },
         {
-          "name": "GET /assignments/1 — confirm the edit applied",
+          "name": "GET /assignments/{{createdAssignmentId}} — confirm the edit applied",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
-            "const j = pm.response.json();",
-            "pm.test('200 + points reflect the PATCH', () => { pm.response.to.have.status(200); pm.expect(j.points).to.eql(120); });"
+            "pm.test('200 + points reflect the PATCH', () => { pm.response.to.have.status(200); pm.expect(pm.response.json().points).to.eql(120); });"
           ] } } ],
-          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/assignments/1", "host": ["{{baseUrl}}"], "path": ["assignments", "1"] } },
+          "request": { "method": "GET", "header": [], "url": { "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}", "host": ["{{baseUrl}}"], "path": ["assignments", "{{createdAssignmentId}}"] } },
           "response": []
         },
         {
-          "name": "PATCH /assignments/1 — course_id immutable (400)",
+          "name": "PATCH /assignments/{{createdAssignmentId}} — courseId immutable (400)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('400', () => pm.response.to.have.status(400));"
           ] } } ],
-          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "body": { "mode": "raw", "raw": "{\"course_id\":3,\"title\":\"moved\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments/1", "host": ["{{baseUrl}}"], "path": ["assignments", "1"] } },
+          "request": { "method": "PATCH", "header": [ { "key": "Content-Type", "value": "application/json" }, { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "body": { "mode": "raw", "raw": "{\"courseId\":3,\"title\":\"moved\"}", "options": { "raw": { "language": "json" } } }, "url": { "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}", "host": ["{{baseUrl}}"], "path": ["assignments", "{{createdAssignmentId}}"] } },
           "response": []
-        },
+        }
+      ]
+    },
+    {
+      "name": "teardown - cleanup (run last)",
+      "description": "Deletes the throwaway assignment and course so the database is left exactly as it was seeded. Deleting the course would cascade-delete its assignment, but we delete the assignment first to exercise DELETE /assignments explicitly.",
+      "item": [
         {
-          "name": "DELETE /assignments — admin deletes created (204)",
+          "name": "DELETE /assignments/{{createdAssignmentId}} — admin deletes temp assignment (204)",
           "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
             "pm.test('204', () => pm.response.to.have.status(204));"
           ] } } ],
           "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "url": { "raw": "{{baseUrl}}/assignments/{{createdAssignmentId}}", "host": ["{{baseUrl}}"], "path": ["assignments", "{{createdAssignmentId}}"] } },
+          "response": []
+        },
+        {
+          "name": "DELETE /courses/{{createdCourseId}} — admin deletes temp course (204)",
+          "event": [ { "listen": "test", "script": { "type": "text/javascript", "exec": [
+            "pm.test('204', () => pm.response.to.have.status(204));"
+          ] } } ],
+          "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{adminToken}}" } ], "url": { "raw": "{{baseUrl}}/courses/{{createdCourseId}}", "host": ["{{baseUrl}}"], "path": ["courses", "{{createdCourseId}}"] } },
           "response": []
         }
       ]
