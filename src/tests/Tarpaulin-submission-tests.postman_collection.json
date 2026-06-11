@@ -1,124 +1,12 @@
 {
   "info": {
-    "_postman_id": "e9ac9708-3744-499e-b9e7-f3f8c71bcd5d",
+    "_postman_id": "cdb3074c-c774-4d2a-911a-215346a1b022",
     "name": "Tarpaulin-submission-tests",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
     "_exporter_id": "53946202",
-    "_collection_link": "https://go.postman.co/collection/53946202-e9ac9708-3744-499e-b9e7-f3f8c71bcd5d?source=collection_link"
+    "_collection_link": "https://go.postman.co/collection/53946202-cdb3074c-c774-4d2a-911a-215346a1b022?source=collection_link"
   },
-  "auth": {
-    "type": "bearer",
-    "bearer": [
-      {
-        "key": "token",
-        "value": "{{adminToken}}",
-        "type": "string"
-      }
-    ]
-  },
-  "variable": [
-    {
-      "key": "adminToken",
-      "value": ""
-    },
-    {
-      "key": "studentToken",
-      "value": ""
-    }
-  ],
   "item": [
-    {
-      "name": "login-admin",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"admin login succeeds\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "pm.collectionVariables.set(\"adminToken\", pm.response.json().token);"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"email\": \"alice@tarpaulin.edu\",\n    \"password\": \"password\"\n}"
-        },
-        "url": {
-          "raw": "http://localhost:8000/users/login",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8000",
-          "path": [
-            "users",
-            "login"
-          ]
-        }
-      },
-      "response": []
-    },
-    {
-      "name": "login-student",
-      "event": [
-        {
-          "listen": "test",
-          "script": {
-            "exec": [
-              "pm.test(\"student login succeeds\", function () {",
-              "    pm.response.to.have.status(200);",
-              "});",
-              "pm.collectionVariables.set(\"studentToken\", pm.response.json().token);"
-            ],
-            "type": "text/javascript"
-          }
-        }
-      ],
-      "request": {
-        "auth": {
-          "type": "noauth"
-        },
-        "method": "POST",
-        "header": [
-          {
-            "key": "Content-Type",
-            "value": "application/json"
-          }
-        ],
-        "body": {
-          "mode": "raw",
-          "raw": "{\n    \"email\": \"dave@tarpaulin.edu\",\n    \"password\": \"password\"\n}"
-        },
-        "url": {
-          "raw": "http://localhost:8000/users/login",
-          "protocol": "http",
-          "host": [
-            "localhost"
-          ],
-          "port": "8000",
-          "path": [
-            "users",
-            "login"
-          ]
-        }
-      },
-      "response": []
-    },
     {
       "name": "submission-tests",
       "item": [
@@ -126,8 +14,101 @@
           "name": "get (many)",
           "item": [
             {
-              "name": "basic-success",
+              "name": "basic-success (admin)",
               "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-success (instructor)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{validTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (instructor)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{invalidTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (student)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{studentToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
                 "method": "GET",
                 "header": [],
                 "url": {
@@ -277,20 +258,94 @@
         },
         {
           "name": "post",
-          "auth": {
-            "type": "bearer",
-            "bearer": [
-              {
-                "key": "token",
-                "value": "{{studentToken}}",
-                "type": "string"
-              }
-            ]
-          },
           "item": [
             {
-              "name": "basic-success",
+              "name": "basic-success (student)",
               "request": {
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "a5d9c821-035e-41b2-984c-0a9164872af4",
+                      "src": "/Users/duncan/Documents/OSU_Work/CS493/Team 10 - Final Project Proposal - CS493.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (instructor)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{validTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "POST",
+                "header": [],
+                "body": {
+                  "mode": "formdata",
+                  "formdata": [
+                    {
+                      "key": "file",
+                      "type": "file",
+                      "uuid": "a5d9c821-035e-41b2-984c-0a9164872af4",
+                      "src": "/Users/duncan/Documents/OSU_Work/CS493/Team 10 - Final Project Proposal - CS493.pdf"
+                    }
+                  ]
+                },
+                "url": {
+                  "raw": "http://localhost:8000/assignments/1/submissions",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "assignments",
+                    "1",
+                    "submissions"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (admin)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
                 "method": "POST",
                 "header": [],
                 "body": {
@@ -384,14 +439,141 @@
               },
               "response": []
             }
-          ]
+          ],
+          "auth": {
+            "type": "bearer",
+            "bearer": [
+              {
+                "key": "token",
+                "value": "{{studentToken}}",
+                "type": "string"
+              }
+            ]
+          }
         },
         {
           "name": "update",
           "item": [
             {
-              "name": "basic-success",
+              "name": "basic-success (admin)",
               "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 9\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-success (instructor)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{validTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 8\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (instructor)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{invalidTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (student)",
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{studentToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
                 "method": "PATCH",
                 "header": [],
                 "body": {
@@ -425,7 +607,7 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "",
+                  "raw": "{\n    \"grade\": 5,\n    \"submitted_at\": \"2025-02-14T19:00:00.000Z\",\n    \"file_url\": \"bad/url/bad\",\n    \"plagiarism_score\": 31,\n    \"student_id\": 51,\n    \"assignment_id\": 74\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -454,7 +636,36 @@
                 "header": [],
                 "body": {
                   "mode": "raw",
-                  "raw": "{\n    \"grade\": 24,\n    \"submitted_at\": \"2025-02-14T19:00:00.000Z\",\n    \"file_url\": \"bad/url/bad\",\n    \"plagiarism_score\": 31,\n    \"student_id\": 51,\n    \"assignment_id\": 74\n}",
+                  "raw": "",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "http://localhost:8000/submissions/21",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "submissions",
+                    "21"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (grade too high)",
+              "request": {
+                "method": "PATCH",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}",
                   "options": {
                     "raw": {
                       "language": "json"
@@ -568,7 +779,7 @@
           "name": "get (download)",
           "item": [
             {
-              "name": "basic-success",
+              "name": "basic-success (admin)",
               "protocolProfileBehavior": {
                 "disableBodyPruning": true
               },
@@ -580,7 +791,7 @@
                   "raw": "{\n    \"grade\": 24\n}"
                 },
                 "url": {
-                  "raw": "http://localhost:8000/media/submissions/496c48e1bb53157d5203cad191d93fd7",
+                  "raw": "http://localhost:8000/media/submissions/18e12f7145e4d5e3e931a7c1d6d07b09",
                   "protocol": "http",
                   "host": [
                     "localhost"
@@ -589,7 +800,121 @@
                   "path": [
                     "media",
                     "submissions",
-                    "496c48e1bb53157d5203cad191d93fd7"
+                    "18e12f7145e4d5e3e931a7c1d6d07b09"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-success (instructor)",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{validTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8000/media/submissions/18e12f7145e4d5e3e931a7c1d6d07b09",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "media",
+                    "submissions",
+                    "18e12f7145e4d5e3e931a7c1d6d07b09"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (instructor)",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{invalidTeacherToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8000/media/submissions/18e12f7145e4d5e3e931a7c1d6d07b09",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "media",
+                    "submissions",
+                    "18e12f7145e4d5e3e931a7c1d6d07b09"
+                  ]
+                }
+              },
+              "response": []
+            },
+            {
+              "name": "basic-failure (student)",
+              "protocolProfileBehavior": {
+                "disableBodyPruning": true
+              },
+              "request": {
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{studentToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "method": "GET",
+                "header": [],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n    \"grade\": 24\n}"
+                },
+                "url": {
+                  "raw": "http://localhost:8000/media/submissions/18e12f7145e4d5e3e931a7c1d6d07b09",
+                  "protocol": "http",
+                  "host": [
+                    "localhost"
+                  ],
+                  "port": "8000",
+                  "path": [
+                    "media",
+                    "submissions",
+                    "18e12f7145e4d5e3e931a7c1d6d07b09"
                   ]
                 }
               },
@@ -653,6 +978,246 @@
           ]
         }
       ]
+    },
+    {
+      "name": "login-admin",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"admin login succeeds\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.collectionVariables.set(\"adminToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"alice@tarpaulin.edu\",\n    \"password\": \"password\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login-student",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"student login succeeds\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.collectionVariables.set(\"studentToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"dave@tarpaulin.edu\",\n    \"password\": \"password\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login-teacher (valid for assign 1)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"teacher login succeeds\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.collectionVariables.set(\"validTeacherToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"bob@tarpaulin.edu\",\n    \"password\": \"password\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "login-teacher (invalid for assign 1)",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test(\"teacher login succeeds\", function () {",
+              "    pm.response.to.have.status(200);",
+              "});",
+              "pm.collectionVariables.set(\"invalidTeacherToken\", pm.response.json().token);"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "request": {
+        "auth": {
+          "type": "noauth"
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"email\": \"carol@tarpaulin.edu\",\n    \"password\": \"password\"\n}"
+        },
+        "url": {
+          "raw": "http://localhost:8000/users/login",
+          "protocol": "http",
+          "host": [
+            "localhost"
+          ],
+          "port": "8000",
+          "path": [
+            "users",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{adminToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "packages": {},
+        "requests": {},
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "adminToken",
+      "value": ""
+    },
+    {
+      "key": "studentToken",
+      "value": ""
+    },
+    {
+      "key": "validTeacherToken",
+      "value": ""
+    },
+    {
+      "key": "invalidTeacherToken",
+      "value": ""
     }
   ]
 }
