@@ -7,6 +7,29 @@ import { authenticate, canManageCourse } from '../../lib/auth.js'
 
 const router = Router()
 
+// Map a Course DB row (snake_case columns) to the OpenAPI response shape.
+function serializeCourse(course) {
+    return {
+        id: course.id,
+        subject: course.subject_code,
+        number: course.number,
+        title: course.title,
+        term: course.term,
+        instructorId: course.instructor_id,
+    }
+}
+
+// Map validated API fields (camelCase) to DB columns, for present keys only.
+function toCourseColumns(data) {
+    const columns = {}
+    if (data.subject !== undefined) columns.subject_code = data.subject
+    if (data.number !== undefined) columns.number = data.number
+    if (data.title !== undefined) columns.title = data.title
+    if (data.term !== undefined) columns.term = data.term
+    if (data.instructorId !== undefined) columns.instructor_id = data.instructorId
+    return columns
+}
+
 /*
  * GET /courses
  * Public.  Returns a paginated list of all Courses, optionally filtered by
@@ -74,7 +97,7 @@ router.get('/', async (req, res, next) => {
     }
 
     return res.status(200).send({
-        courses: courses,
+        courses: courses.map(serializeCourse),
         page: page,
         pageSize: pageSize,
         totalCount: totalCount,
@@ -98,12 +121,12 @@ router.post('/',
 
         const data = Course.parse(req.body)
 
-        const instructor = await prisma.user.findUnique({ where: { id: data.instructor_id } })
+        const instructor = await prisma.user.findUnique({ where: { id: data.instructorId } })
         if (!instructor || instructor.role !== 'instructor') {
-            return res.status(400).send({ error: "instructor_id must reference a User with the 'instructor' role" })
+            return res.status(400).send({ error: "instructorId must reference a User with the 'instructor' role" })
         }
 
-        const course = await prisma.course.create({ data: data })
+        const course = await prisma.course.create({ data: toCourseColumns(data) })
         return res.status(201).send({ id: course.id })
     }
 )
@@ -131,7 +154,7 @@ router.get('/:id', async (req, res, next) => {
 
     const { _count, ...courseData } = course
     return res.status(200).send({
-        ...courseData,
+        ...serializeCourse(courseData),
         studentCount: _count.enrollments,
         assignmentCount: _count.assignments
     })
@@ -166,14 +189,14 @@ router.patch('/:id',
         }
 
         // If the instructor is being reassigned, the new id must be an instructor.
-        if (data.instructor_id !== undefined) {
-            const instructor = await prisma.user.findUnique({ where: { id: data.instructor_id } })
+        if (data.instructorId !== undefined) {
+            const instructor = await prisma.user.findUnique({ where: { id: data.instructorId } })
             if (!instructor || instructor.role !== 'instructor') {
-                return res.status(400).send({ error: "instructor_id must reference a User with the 'instructor' role" })
+                return res.status(400).send({ error: "instructorId must reference a User with the 'instructor' role" })
             }
         }
 
-        await prisma.course.update({ where: { id: id }, data: data })
+        await prisma.course.update({ where: { id: id }, data: toCourseColumns(data) })
         return res.status(200).send()
     }
 )

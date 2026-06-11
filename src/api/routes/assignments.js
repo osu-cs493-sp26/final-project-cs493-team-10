@@ -202,26 +202,47 @@ router.post('/:id/submissions',
     }
 )
 
+// Map an Assignment DB row (snake_case columns) to the OpenAPI response shape.
+function serializeAssignment(assignment) {
+    return {
+        id: assignment.id,
+        courseId: assignment.course_id,
+        title: assignment.title,
+        points: assignment.points,
+        due: assignment.due_date,
+    }
+}
+
+// Map validated API fields (camelCase) to DB columns, for present keys only.
+function toAssignmentColumns(data) {
+    const columns = {}
+    if (data.courseId !== undefined) columns.course_id = data.courseId
+    if (data.title !== undefined) columns.title = data.title
+    if (data.points !== undefined) columns.points = data.points
+    if (data.due !== undefined) columns.due_date = data.due
+    return columns
+}
+
 /*
  * POST /assignments
  * Create a new Assignment.  Only an admin or the instructor who owns the
- * Course referenced by course_id may do this.
+ * Course referenced by courseId may do this.
  */
 router.post('/',
     authenticate,
     async (req, res, next) => {
         const data = Assignment.parse(req.body)
 
-        const course = await prisma.course.findUnique({ where: { id: data.course_id } })
+        const course = await prisma.course.findUnique({ where: { id: data.courseId } })
         if (!course) {
-            return res.status(400).send({ error: "course_id must reference an existing course" })
+            return res.status(400).send({ error: "courseId must reference an existing course" })
         }
 
         if (!canManageCourse(req.user, course)) {
             return res.status(403).send({ error: "Only an admin or the course's instructor can create an assignment for this course" })
         }
 
-        const assignment = await prisma.assignment.create({ data: data })
+        const assignment = await prisma.assignment.create({ data: toAssignmentColumns(data) })
         return res.status(201).send({ id: assignment.id })
     }
 )
@@ -242,7 +263,7 @@ router.get('/:id', async (req, res, next) => {
         return next() // 404 handler
     }
 
-    return res.status(200).send(assignment)
+    return res.status(200).send(serializeAssignment(assignment))
 })
 
 /*
@@ -268,8 +289,8 @@ router.patch('/:id',
             return res.status(403).send({ error: "Only an admin or the course's instructor can update this assignment" })
         }
 
-        if (req.body.course_id !== undefined) {
-            return res.status(400).send({ error: "course_id cannot be changed; an assignment cannot be moved to another course" })
+        if (req.body.courseId !== undefined) {
+            return res.status(400).send({ error: "courseId cannot be changed; an assignment cannot be moved to another course" })
         }
 
         const data = Assignment.partial().parse(req.body)
@@ -277,7 +298,7 @@ router.patch('/:id',
             return res.status(400).send({ error: "Request body must contain at least one assignment field to update" })
         }
 
-        await prisma.assignment.update({ where: { id: id }, data: data })
+        await prisma.assignment.update({ where: { id: id }, data: toAssignmentColumns(data) })
         return res.status(200).send()
     }
 )

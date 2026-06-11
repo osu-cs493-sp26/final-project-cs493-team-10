@@ -3,18 +3,18 @@ import * as z from "zod"
 const RoleSchema = z.enum(['admin', 'instructor', 'student'])
 
 export const Course = z.object({
-    subject_code: z.string().min(1),
+    subject: z.string().min(1),
     number: z.int().positive(),
     title: z.string().min(1),
     term: z.string().min(1),
-    instructor_id: z.int().positive(),
+    instructorId: z.int().positive(),
 })
 
 export const Assignment = z.object({
-    course_id: z.int().positive(),
+    courseId: z.int().positive(),
     title: z.string().min(1),
     points: z.int().min(0),
-    due_date: z.iso.datetime({ offset: true }),
+    due: z.iso.datetime({ offset: true }),
 })
 
 // used to validate the enrollment-update body for POST /courses/{id}/students
