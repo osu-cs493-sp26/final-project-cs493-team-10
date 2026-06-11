@@ -1,7 +1,7 @@
 import { Router } from 'express'
 
 import prisma from '../../lib/prisma.js'
-import { PAGE_SIZE } from '../../constants.js'
+import { COURSE_PAGE_SIZE } from '../../constants.js'
 import { Course, EnrollmentUpdate } from '../../lib/zod.js'
 import { authenticate, canManageCourse } from '../../lib/auth.js'
 
@@ -18,7 +18,7 @@ router.get('/', async (req, res, next) => {
     if (Number.isNaN(page) || page < 1) {
         page = 1
     }
-    const pageSize = PAGE_SIZE
+    const pageSize = COURSE_PAGE_SIZE
 
     // Build the filter from the supported query params.
     const where = {}
