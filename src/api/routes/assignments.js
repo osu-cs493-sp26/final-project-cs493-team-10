@@ -6,6 +6,7 @@ import { createClient } from '@supabase/supabase-js'
 import { PAGE_SIZE } from '../../constants.js'
 import prisma from '../../lib/prisma.js'
 import submissionQueue from '../../lib/submission-queue.js'
+import { Assignment } from '../../lib/zod.js'
 import {
     authenticate,
     canManageCourse
@@ -198,6 +199,135 @@ router.post('/:id/submissions',
         )
 
         return res.status(201).send({ id: submission.id })
+    }
+)
+
+// Map an Assignment DB row (snake_case columns) to the OpenAPI response shape.
+function serializeAssignment(assignment) {
+    return {
+        id: assignment.id,
+        courseId: assignment.course_id,
+        title: assignment.title,
+        points: assignment.points,
+        due: assignment.due_date,
+    }
+}
+
+// Map validated API fields (camelCase) to DB columns, for present keys only.
+function toAssignmentColumns(data) {
+    const columns = {}
+    if (data.courseId !== undefined) columns.course_id = data.courseId
+    if (data.title !== undefined) columns.title = data.title
+    if (data.points !== undefined) columns.points = data.points
+    if (data.due !== undefined) columns.due_date = data.due
+    return columns
+}
+
+/*
+ * POST /assignments
+ * Create a new Assignment.  Only an admin or the instructor who owns the
+ * Course referenced by courseId may do this.
+ */
+router.post('/',
+    authenticate,
+    async (req, res, next) => {
+        const data = Assignment.parse(req.body)
+
+        const course = await prisma.course.findUnique({ where: { id: data.courseId } })
+        if (!course) {
+            return res.status(400).send({ error: "courseId must reference an existing course" })
+        }
+
+        if (!canManageCourse(req.user, course)) {
+            return res.status(403).send({ error: "Only an admin or the course's instructor can create an assignment for this course" })
+        }
+
+        const assignment = await prisma.assignment.create({ data: toAssignmentColumns(data) })
+        return res.status(201).send({ id: assignment.id })
+    }
+)
+
+/*
+ * GET /assignments/{id}
+ * Public.  Returns summary data about the Assignment, excluding its
+ * Submissions.
+ */
+router.get('/:id', async (req, res, next) => {
+    const id = parseInt(req.params.id)
+    if (Number.isNaN(id)) {
+        return res.status(400).send({ error: "Invalid assignment id specified in the path" })
+    }
+
+    const assignment = await prisma.assignment.findUnique({ where: { id: id } })
+    if (!assignment) {
+        return next() // 404 handler
+    }
+
+    return res.status(200).send(serializeAssignment(assignment))
+})
+
+/*
+ * PATCH /assignments/{id}
+ * Partial update.  Only an admin or the owning instructor may do this.  The
+ * Assignment's course_id is immutable and cannot be changed here.
+ */
+router.patch('/:id',
+    authenticate,
+    async (req, res, next) => {
+        const id = parseInt(req.params.id)
+        if (Number.isNaN(id)) {
+            return res.status(400).send({ error: "Invalid assignment id specified in the path" })
+        }
+
+        const assignment = await prisma.assignment.findUnique({ where: { id: id } })
+        if (!assignment) {
+            return next() // 404 handler
+        }
+
+        const course = await prisma.course.findUnique({ where: { id: assignment.course_id } })
+        if (!canManageCourse(req.user, course)) {
+            return res.status(403).send({ error: "Only an admin or the course's instructor can update this assignment" })
+        }
+
+        if (req.body.courseId !== undefined) {
+            return res.status(400).send({ error: "courseId cannot be changed; an assignment cannot be moved to another course" })
+        }
+
+        const data = Assignment.partial().parse(req.body)
+        if (Object.keys(data).length === 0) {
+            return res.status(400).send({ error: "Request body must contain at least one assignment field to update" })
+        }
+
+        await prisma.assignment.update({ where: { id: id }, data: toAssignmentColumns(data) })
+        return res.status(200).send()
+    }
+)
+
+/*
+ * DELETE /assignments/{id}
+ * Only an admin or the owning instructor may remove an Assignment.  Its
+ * Submissions are removed via the schema's cascade rules.
+ */
+router.delete('/:id',
+    authenticate,
+    async (req, res, next) => {
+        const id = parseInt(req.params.id)
+        if (Number.isNaN(id)) {
+            return res.status(400).send({ error: "Invalid assignment id specified in the path" })
+        }
+
+        const assignment = await prisma.assignment.findUnique({ where: { id: id } })
+        if (!assignment) {
+            return next() // 404 handler
+        }
+
+        const course = await prisma.course.findUnique({ where: { id: assignment.course_id } })
+        if (!canManageCourse(req.user, course)) {
+            return res.status(403).send({ error: "Only an admin or the course's instructor can delete this assignment" })
+        }
+
+        await prisma.assignment.delete({ where: { id: id } })
+        return res.status(204).send()
     }
 )
 

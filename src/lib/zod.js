@@ -2,6 +2,27 @@ import * as z from "zod"
 
 const RoleSchema = z.enum(['admin', 'instructor', 'student'])
 
+export const Course = z.object({
+    subject: z.string().min(1),
+    number: z.int().positive(),
+    title: z.string().min(1),
+    term: z.string().min(1),
+    instructorId: z.int().positive(),
+})
+
+export const Assignment = z.object({
+    courseId: z.int().positive(),
+    title: z.string().min(1),
+    points: z.int().min(0),
+    due: z.iso.datetime({ offset: true }),
+})
+
+// used to validate the enrollment-update body for POST /courses/{id}/students
+export const EnrollmentUpdate = z.object({
+    add: z.array(z.int().positive()).optional(),
+    remove: z.array(z.int().positive()).optional(),
+})
+
 // passwords are accepted only as input and are hashed before persistence
 export const CreateUserSchema = z.object({
     name: z.string().trim().min(1),
